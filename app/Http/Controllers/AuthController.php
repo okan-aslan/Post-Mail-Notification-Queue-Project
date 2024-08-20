@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\ApiResponses;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class AuthController extends Controller
 
         $user = User::create($validated);
 
-        return $this->success($user, "User created successfully.", 201);
+        return $this->success(new UserResource($user), "User created successfully.", 201);
     }
 
     public function login(LoginUserRequest $request): JsonResponse
@@ -36,14 +37,14 @@ class AuthController extends Controller
         $token = $user->createToken('token')->plainTextToken;
 
         return $this->success([
-            'user' => $user,
+            'user' => new UserResource($user),
             'token' => $token,
         ], "User logged-in successfully.", 200);
     }
 
     public function profile(Request $request): JsonResponse
     {
-        return $this->success($request->user(), "User profile retrieved successfully", 200);
+        return $this->success(new UserResource($request->user()), "User profile retrieved successfully", 200);
     }
 
     public function logout(Request $request): JsonResponse
