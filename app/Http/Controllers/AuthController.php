@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\ApiResponses;
+use App\Traits\ApiResponses;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Http\Resources\UserResource;
