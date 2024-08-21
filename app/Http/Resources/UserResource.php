@@ -18,6 +18,11 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'createdAt' => $this->created_at->format('Y-m-d H:i:s'),
+            'role' => $this->when(
+                $request->user() && $request->user()->isAdmin() && $this->role !== null,
+                $this->role
+            ),
+            'posts' => PostResource::collection($this->whenLoaded('posts')),
         ];
     }
 }
