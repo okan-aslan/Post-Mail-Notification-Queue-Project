@@ -17,4 +17,11 @@ class PostPolicy
             ? Response::allow()
             : Response::deny("This post doesn't belongs to you.");
     }
+
+    public function admin(User $user)
+    {
+        return $user->isAdmin()
+            ? Response::allow()
+            : Response::deny("Unauthorized");
+    }
 }
