@@ -40,10 +40,10 @@ A Laravel-based application for managing posts, designed to handle post creation
     ```bash
    php artisan migrate
    ```
-
+## Postman
 ![Screenshot 2024-08-22 at 2 29 36 PM](https://github.com/user-attachments/assets/831531ad-5b86-4b28-b1f8-bf67eed654cb)
 
-
+## Queue
 ![Screenshot 2024-08-22 at 2 00 09 PM](https://github.com/user-attachments/assets/29f6094a-b408-4ebf-9324-9337d2923858)
 ![Screenshot 2024-08-22 at 2 18 20 PM](https://github.com/user-attachments/assets/6ecf6d8f-3e2a-49d5-b4d1-af42d1f517ff)
 
