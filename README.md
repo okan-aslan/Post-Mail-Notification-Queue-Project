@@ -31,6 +31,7 @@ A Laravel-based application for managing posts, designed to handle post creation
     ```dotenv
     DB_CONNECTION=sqlite
     DB_DATABASE=/path_to_your_database/database.sqlite
+    QUEUE_CONNECTION=redis
     REDIS_CLIENT=phpredis
     REDIS_HOST=127.0.0.1
     REDIS_PASSWORD=null
