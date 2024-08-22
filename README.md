@@ -5,7 +5,7 @@ A Laravel-based application for managing posts, designed to handle post creation
 ## Features
 
 - **Post Creation**: Users can create posts which trigger notifications to administrators.
-- **Email Notifications**: Admins receive email notifications with options to view or publish posts. Notifications are handled using `imitate.email`.
+- **Email Notifications**: Admins receive email notifications with options to view or publish posts. Notifications are handled using `[imitate.email](https://imitate.email/)`.
 - **Queue Management**: Redis is used for managing job queues, ensuring efficient processing of post-related tasks.
 - **Post Approval Workflow**: Admins can review and approve posts through an interface with a publish option.
 - **Retry and Timeout Handling**: Configured to retry failed jobs and handle timeouts effectively.
