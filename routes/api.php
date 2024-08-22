@@ -20,5 +20,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     Route::put('/posts/{post}', [PostController::class, 'update'])->name('posts.update');
     Route::delete('/posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+
+    Route::get('/posts/pending/admin', [PostController::class, 'indexPendingPosts'])->name('posts.index.pending');
+    Route::get('/posts/pending/{post}/admin', [PostController::class, 'showPendingPost'])->name('posts.show.pending');
+    Route::get('/posts/{post}/publish', [PostController::class, 'publish'])->name('posts.publish');
 });
 
