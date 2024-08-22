@@ -10,6 +10,7 @@ use App\Jobs\PublishPostJob;
 use App\Models\Post;
 use App\Models\User;
 use App\Notifications\PostCreated;
+use App\Notifications\PostUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -36,8 +37,10 @@ class PostController extends Controller
 
         $admins = User::admin()->get();
 
+        $delay = now()->addMinutes(10);
+
         foreach ($admins as $admin) {
-            $admin->notify(new PostCreated($post));
+            $admin->notify((new PostUpdated($post))->delay($delay));
         }
 
         return $this->success(new PostResource($post), 'Post created successfully.', 201);
@@ -64,6 +67,14 @@ class PostController extends Controller
 
         $post->update($request->validated());
 
+        $admins = User::admin()->get();
+
+        $delay = now()->addMinutes(10);
+
+        foreach ($admins as $admin) {
+            $admin->notify((new PostUpdated($post))->delay($delay));
+        }
+
         return $this->success(new PostResource($post), 'Post updated successfully', 201);
     }
 
@@ -81,23 +92,29 @@ class PostController extends Controller
 
     public function indexPendingPosts(Request $request)
     {
-        Gate::authorize('admin');
+        if (!$request->user()->isAdmin() || !$request->user()) {
+            return $this->error(null, "Unauthorized", 403);
+        }
 
         $posts = Post::PendingPosts()->orderBy('updated_at', 'DESC')->paginate(10);
 
         return $this->success(PostResource::collection($posts->load('user')), 'Showing all pending posts.');
     }
 
-    public function showPendingPost(Post $post)
+    public function showPendingPost(Request $request, Post $post)
     {
-        Gate::authorize('admin');
+        if (!$request->user()->isAdmin() || !$request->user()) {
+            return $this->error(null, "Unauthorized", 403);
+        }
 
         return $this->success(new PostResource($post->load('user')), 'Showing post.');
     }
 
-    public function publish(Post $post)
+    public function publish(Request $request, Post $post)
     {
-        Gate::authorize('admin', $post);
+        if (!$request->user()->isAdmin() || !$request->user()) {
+            return $this->error(null, "Unauthorized", 403);
+        }
 
         PublishPostJob::dispatch($post);
 
