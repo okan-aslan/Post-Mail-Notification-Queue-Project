@@ -20,6 +20,7 @@ class PostCreated extends Notification implements ShouldQueue
     public function __construct(Post $post)
     {
         $this->post = $post;
+        $this->onConnection('redis');
     }
 
     /**
@@ -32,21 +33,20 @@ class PostCreated extends Notification implements ShouldQueue
         return ['mail'];
     }
 
-        /**
-         * Get the mail representation of the notification.
-         */
-        public function toMail(object $notifiable): MailMessage
-        {
-            return (new MailMessage)
-                ->subject('New Post Created: ' . $this->post->title)
-                ->greeting('Hello Admin!')
-                ->line('A new post has been created and is pending approval.')
-                ->line('Title: ' . $this->post->title)
-                ->action('Review Post', url('/posts/pending/' . $this->post->id . '/admin'))
-                ->line('If you approve this post, you can publish it.')
-                ->action('Publish Post', url('/posts/' . $this->post->id . '/publish'))
-                ->line('Thank you for your prompt action!');
-        }
+    /**
+     * Get the mail representation of the notification.
+     */
+    public function toMail(object $notifiable): MailMessage
+    {
+        return (new MailMessage)
+            ->subject('New Post Created: ' . $this->post->title)
+            ->greeting('Hello, Admin!')
+            ->line('A new post has been created.')
+            ->line('Title: ' . $this->post->title)
+            ->line('Content: ' . $this->post->content)
+            ->action('Publish post', url("/posts/{$this->post->id}/publish"))
+            ->line('Thank you for using our application!');
+    }
 
     /**
      * Get the array representation of the notification.
