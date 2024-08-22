@@ -6,7 +6,10 @@ use App\Traits\ApiResponses;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
+use App\Jobs\PublishPostJob;
 use App\Models\Post;
+use App\Models\User;
+use App\Notifications\PostCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -19,7 +22,7 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $posts = Post::orderBy('updated_at', 'DESC')->paginate(10);
+        $posts = Post::PublishedPosts()->orderBy('updated_at', 'DESC')->paginate(10);
 
         return $this->success(PostResource::collection($posts->load('user')), 'Showing posts.');
     }
@@ -29,10 +32,13 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        $post = $request->user()->posts()->create([
-            'title' => $request->input('title'),
-            'content' => $request->input('content'),
-        ]);
+        $post = $request->user()->posts()->create($request->validated());
+
+        $admins = User::admin()->get();
+
+        foreach ($admins as $admin) {
+            $admin->notify(new PostCreated($post));
+        }
 
         return $this->success(new PostResource($post), 'Post created successfully.', 201);
     }
@@ -71,5 +77,30 @@ class PostController extends Controller
         $post->delete();
 
         return $this->success(null, 'Post deleted successfully.', 200);
+    }
+
+    public function indexPendingPosts(Request $request)
+    {
+        Gate::authorize('admin');
+
+        $posts = Post::PendingPosts()->orderBy('updated_at', 'DESC')->paginate(10);
+
+        return $this->success(PostResource::collection($posts->load('user')), 'Showing all pending posts.');
+    }
+
+    public function showPendingPost(Post $post)
+    {
+        Gate::authorize('admin');
+
+        return $this->success(new PostResource($post->load('user')), 'Showing post.');
+    }
+
+    public function publish(Post $post)
+    {
+        Gate::authorize('admin', $post);
+
+        PublishPostJob::dispatch($post);
+
+        return $this->success(new PostResource($post), 'Post yayınlama işlemi kuyruğa alındı.', 200);
     }
 }
